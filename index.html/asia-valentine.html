@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Will You Be My Valentine? ❤️</title>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: url("https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1600") center/cover no-repeat;
+}
+
+.overlay { position: fixed; inset:0; background: rgba(255,255,255,0.75); }
+
+.box {
+    position: relative; z-index: 2;
+    background: white;
+    padding: 40px;
+    border-radius: 22px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    text-align: center;
+    max-width: 420px;
+    margin: auto;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+h1,h2{ color: #e91e63; margin-bottom:10px; }
+button{
+    padding:12px 26px; font-size:18px; border:none; border-radius:12px; cursor:pointer; margin:10px; transition:0.25s;
+}
+#startBtn{background:#e91e63;color:white;}
+#yesBtn{background:#4caf50;color:white;font-size:18px;}
+#noBtn{background:#f44336;color:white;position:absolute;}
+.bigYes{transform: scale(1.3);}
+
+#countdown{font-weight:bold;margin-top:10px;color:#444;font-size:18px;}
+.heart{position:absolute;font-size:20px;color:#e91e63;animation:fall linear forwards;z-index:1;opacity:0.9;}
+@keyframes fall{to{transform:translateY(110vh);opacity:0.3;}}
+.heart-frame{position:relative;display:inline-block;margin-bottom:15px;}
+.heart-frame .heart{animation:rotateHeart 4s linear infinite;transform-origin:center center;}
+@keyframes rotateHeart{0%{transform:rotate(0deg) translateX(120px) rotate(0deg);}100%{transform:rotate(360deg) translateX(120px) rotate(-360deg);}}
+
+.confetti{position:fixed;width:8px;height:14px;top:-10px;animation:fall linear forwards;}
+
+#quizOptions button{
+    margin:6px;padding:10px 20px;border:none;border-radius:12px;cursor:pointer;
+}
+
+/* تحسين الرسالة الختامية - بمسافات مناسبة */
+#endMessage {
+    font-size: 20px;
+    line-height: 1.6;  /* مسافة مناسبة بين السطور */
+    color: #e91e63;
+    text-align: center;
+    animation: fadeInUp 1s ease;
+    background: linear-gradient(135deg, #fff0f5, #fff);
+    padding: 30px 25px;
+    border-radius: 30px;
+    box-shadow: 0 10px 30px rgba(233,30,99,0.2);
+    white-space: pre-wrap;
+    word-spacing: normal;  /* إلغاء المسافة الإضافية بين الكلمات */
+    letter-spacing: normal; /* مسافة عادية بين الحروف */
+    max-height: 60vh;
+    overflow-y: auto;
+    direction: ltr;
+    font-weight: 500;
+}
+
+#endMessage p {
+    margin: 12px 0;
+}
+
+#endMessage .heart-line {
+    font-size: 24px;
+    margin: 15px 0;
+    color: #ff1493;
+    letter-spacing: 5px;
+}
+
+#endMessage .highlight-box {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ff1493;
+    background: rgba(255, 20, 147, 0.1);
+    padding: 8px 20px;
+    border-radius: 40px;
+    display: inline-block;
+    margin: 10px 0;
+}
+
+#endMessage .big-message {
+    font-size: 26px;
+    font-weight: bold;
+    color: #ff1493;
+    margin: 15px 0;
+    text-shadow: 1px 1px 3px rgba(255,20,147,0.2);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* رسالة منبثقة للإجابات */
+.feedback-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px 40px;
+    border-radius: 50px;
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    z-index: 2000;
+    animation: popIn 0.4s ease-out;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    text-align: center;
+    border: 3px solid white;
+}
+
+.feedback-popup.correct {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+}
+
+.feedback-popup.wrong {
+    background: linear-gradient(135deg, #f44336, #d32f2f);
+}
+
+@keyframes popIn {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* تأثير للأسئلة */
+#quizQuestion {
+    font-size: 22px;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* زر إعادة اللعب */
+.restart-btn {
+    background: #e91e63;
+    color: white;
+    padding: 12px 35px;
+    font-size: 18px;
+    border-radius: 50px;
+    margin-top: 20px;
+    transition: transform 0.3s;
+}
+
+.restart-btn:hover {
+    transform: scale(1.05);
+    background: #c2185b;
+}
+
+/* تحسين عرض الإجابات */
+#quizOptions button {
+    font-size: 18px;
+    padding: 12px 22px;
+    margin: 8px;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+#quizOptions button:hover {
+    transform: scale(1.03);
+    filter: brightness(0.9);
+}
+</style>
+</head>
+
+<body>
+<div class="overlay"></div>
+
+<!-- Start -->
+<div class="box" id="screenStart">
+<h1>Hey 💌</h1>
+<p>A sweet surprise awaits you!</p>
+<button id="startBtn">Open ✨</button>
+</div>
+
+<!-- Game -->
+<div class="box" id="screenGame" style="display:none;">
+<h1>Will you be my Valentine? ❤️</h1>
+<div class="heart-frame">
+<img src="asia.jpg" style="width:220px;border-radius:16px;position:relative;z-index:2;">
+<span class="heart" style="animation-delay:0s">❤️</span>
+<span class="heart" style="animation-delay:0.5s">❤️</span>
+<span class="heart" style="animation-delay:1s">❤️</span>
+<span class="heart" style="animation-delay:1.5s">❤️</span>
+<span class="heart" style="animation-delay:2s">❤️</span>
+</div>
+<div id="countdown"></div>
+<div style="margin-top:20px;">
+<button id="yesBtn">Yes 💗</button>
+<button id="noBtn">No 🙈</button>
+</div>
+</div>
+
+<!-- Quiz -->
+<div class="box" id="screenQuiz" style="display:none;">
+<h2>Test Your Knowledge! 🎲</h2>
+<p id="quizQuestion"></p>
+<div id="quizOptions"></div>
+<p id="quizResult" style="font-weight:bold;margin-top:10px;"></p>
+</div>
+
+<!-- End -->
+<div class="box" id="screenEnd" style="display:none;">
+<div id="endMessage"></div>
+<button class="restart-btn" id="restartBtn" onclick="restartGame()" style="display:none;">🔄 Play Again</button>
+</div>
+
+<!-- Audio -->
+<audio id="music" loop>
+<source src="naika.mp3" type="audio/mpeg">
+</audio>
+
+<!-- أصوات جديدة للإجابات -->
+<audio id="correctSound" preload="auto">
+    <source src="https://www.myinstants.com/media/sounds/winxp.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="wrongSound" preload="auto">
+    <source src="https://www.myinstants.com/media/sounds/windows-xp-error.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const startBtn = document.getElementById("startBtn");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const music = document.getElementById("music");
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
+
+// ضبط مستوى الصوت
+correctSound.volume = 0.4;
+wrongSound.volume = 0.3;
+
+// دالة إظهار رسالة منبثقة مع الصوت
+function showFeedback(message, type) {
+    // تشغيل الصوت
+    if (type === 'correct') {
+        correctSound.currentTime = 0;
+        correctSound.play().catch(e => {
+            console.log("خطأ في تشغيل الصوت، استخدام صوت احتياطي");
+            // صوت احتياطي إذا فشل تحميل الصوت
+            const beep = new Audio("data:audio/wav;base64,UklGRlwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAAA8AP8A/gD+AP8A/wD/AP8A");
+            beep.volume = 0.4;
+            beep.play();
+        });
+    } else {
+        wrongSound.currentTime = 0;
+        wrongSound.play().catch(e => {
+            console.log("خطأ في تشغيل الصوت، استخدام صوت احتياطي");
+            const beep = new Audio("data:audio/wav;base64,UklGRlwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAAA8AP8A/gD+AP8A/wD/AP8A");
+            beep.volume = 0.3;
+            beep.play();
+        });
+    }
+
+    // إظهار الرسالة المنبثقة
+    const feedback = document.createElement('div');
+    feedback.className = `feedback-popup ${type}`;
+    feedback.textContent = message;
+    document.body.appendChild(feedback);
+
+    // إخفاء الرسالة بعد ثانية
+    setTimeout(() => {
+        feedback.remove();
+    }, 800);
+}
+
+/* Start */
+startBtn.onclick = () => {
+document.getElementById("screenStart").style.display="none";
+document.getElementById("screenGame").style.display="block";
+music.play();
+};
+
+/* NO button moves */
+noBtn.addEventListener("mouseover", () => {
+const x = Math.random()*260;
+const y = Math.random()*160;
+noBtn.style.left = x+"px";
+noBtn.style.top = y+"px";
+});
+
+/* Countdown */
+const target = new Date("Feb 14, 2026 00:00:00").getTime();
+setInterval(()=>{
+const now = Date.now();
+const d = target-now;
+if(d<0) return;
+const days=Math.floor(d/86400000);
+const hrs=Math.floor((d%86400000)/3600000);
+const mins=Math.floor((d%3600000)/60000);
+document.getElementById("countdown").innerText=`Countdown: ${days}d ${hrs}h ${mins}m`;
+},60000);
+
+/* Hearts floating */
+function createHeart() {
+const heart = document.createElement("div");
+heart.className = "heart";
+heart.innerHTML = "❤️";
+heart.style.left = Math.random()*100+"vw";
+heart.style.fontSize = (16+Math.random()*24)+"px";
+heart.style.animationDuration = (3+Math.random()*3)+"s";
+document.body.appendChild(heart);
+setTimeout(()=>heart.remove(),6000);
+}
+setInterval(createHeart, 300);
+
+/* Confetti */
+function launchConfetti(){
+for(let i=0;i<100;i++){
+const c=document.createElement("div");
+c.className="confetti";
+c.style.left=Math.random()*100+"vw";
+c.style.background=`hsl(${Math.random()*360},100%,60%)`;
+c.style.animationDuration=(3+Math.random()*2)+"s";
+document.body.appendChild(c);
+setTimeout(()=>c.remove(),4000);
+}
+}
+
+/* Quiz */
+const quiz=[
+{question:"What's the most special day for me?", options:["Dec 1","Feb 2","Dec 25"], answer:0},
+{question:"What's my favorite place?", options:["Al-Luwaibdeh","Jabal Amman","The place I'm with you"], answer:2},
+{question:"How do I like to leave work?", options:["Go straight home","Run errands first","Go with you"], answer:2}
+];
+
+let currentQ=0;
+
+function showQuestion(){
+const q=quiz[currentQ];
+document.getElementById("quizQuestion").innerText=q.question;
+const optionsDiv=document.getElementById("quizOptions");
+optionsDiv.innerHTML="";
+const colors=["#f48fb1","#ffcc80","#90caf9","#a5d6a7","#ce93d8"];
+q.options.forEach((opt,i)=>{
+const btn=document.createElement("button");
+btn.innerText=opt;
+btn.style.background=colors[i%colors.length];
+btn.style.color="white";
+btn.onclick=()=>checkAnswer(i);
+optionsDiv.appendChild(btn);
+});
+document.getElementById("quizResult").innerText="";
+}
+
+function checkAnswer(selected){
+const q=quiz[currentQ];
+if(selected===q.answer){
+    showFeedback("🎉 CORRECT! 🎉", "correct");
+    currentQ++;
+    if(currentQ<quiz.length){
+        setTimeout(showQuestion, 800);
+    }
+    else{
+        setTimeout(()=>{
+            document.getElementById("screenQuiz").style.display="none";
+            document.getElementById("screenEnd").style.display="block";
+            document.getElementById("restartBtn").style.display="inline-block";
+            launchConfetti();
+            showEnhancedEndMessage();
+        }, 1000);
+    }
+}else{
+    showFeedback("❌ WRONG! ❌", "wrong");
+}
+}
+
+/* Yes button opens quiz */
+yesBtn.onclick=()=>{
+document.getElementById("screenGame").style.display="none";
+document.getElementById("screenQuiz").style.display="block";
+currentQ=0;
+showQuestion();
+};
+
+/* Enhanced End Message - بمسافات مناسبة */
+function showEnhancedEndMessage() {
+    const endMessageDiv = document.getElementById("endMessage");
+    
+    // رسالة بمسافات معتدلة
+    const message = `❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️
+
+TODAY WAS ALL ABOUT YOU
+
+Your laugh, your heart, and all the 
+little moments that make life brighter.
+
+❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️
+
+With every second, every question, 
+every heart spinning around you,
+I feel how wonderful it is to have you here.
+
+❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️
+
+YOU ARE MY VALENTINE
+
+Not just today, but every beautiful day,
+every dream, and every joy of my heart.
+
+❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️
+
+Thank you for being you,
+for being here in every moment,
+and for making the world seem brighter.
+
+❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️
+
+FOREVER YOURS ✨🌹
+
+❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️`;
+
+    // تشغيل التأثير الكتابي
+    let i = 0;
+    endMessageDiv.innerText = "";
+    
+    function typeWriter() {
+        if (i < message.length) {
+            endMessageDiv.innerText += message[i];
+            i++;
+            setTimeout(typeWriter, 20);
+        }
+    }
+    
+    typeWriter();
+}
+
+// دالة إعادة تشغيل اللعبة
+function restartGame() {
+    document.getElementById("screenEnd").style.display = "none";
+    document.getElementById("restartBtn").style.display = "none";
+    document.getElementById("screenStart").style.display = "block";
+    currentQ = 0;
+    music.pause();
+    music.currentTime = 0;
+}
+
+// إضافة مستمع لزر إعادة التشغيل
+document.getElementById("restartBtn").addEventListener("click", restartGame);
+</script>
+</body>
+</html>
